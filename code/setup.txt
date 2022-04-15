@@ -1,1 +1,1 @@
-C:/Users/STFED/Anaconda3/envs/py39/lib/site-packages
+C:\\Users\\STFED\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python310\\site-packages

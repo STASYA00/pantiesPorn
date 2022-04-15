@@ -2,17 +2,18 @@ import bpy
 import os
 import sys
 
+
 file_dir = os.path.dirname(__file__)
 sys.path.append(file_dir)
-
-# from assembler import Assembler
 from background import Background
+from cameramanager import CameraManager
+from config import BLEND_DIR
+from light import LightSetup
+from log import Log
+from mood_calculator import MoodCalculator
 from panties import Panties
-# from config import FRAMES, LOG
-#from database import Database
-# from logger import Logger
 from renderer import Renderer
-# from scenemanager import SceneManager
+from tracker import Tracker
 
 
 class Pipeline:
@@ -58,7 +59,6 @@ class RenderPipeline(Pipeline):
         renderer.render(filename="1" + str(self.value))
 
 
-
 class MainPipeline(Pipeline):
     """
     Pipeline that creates different character configurations.
@@ -70,28 +70,42 @@ class MainPipeline(Pipeline):
         """
         super().__init__(value)
 
-    def _run(self):
+    def run(self, val=0):
+        return self._run(val)
+
+    def _run(self, current_frame=1):
         """
         Function that creates different character configurations.
         """
-        #database = Database()
-        #log = Logger()
+        total_frames = self.value + current_frame
         background = Background()
         character = Panties()
         renderer = Renderer()
-        #scenemanager = SceneManager()
-        for i in range(self.value):
-            print("EPOCH {}".format(i))
-            #scenemanager.update_frame(i)
-            background.make()
-            character.make()
-            # log.make(character, background, i)
-            #scenemanager.make(character, background=background, frame=i)
-            renderer.render(filename=str("%04d" % i)) #+ "_{}".format(character.get_name()))
-
-            # if i % FRAMES == 0 and i > 0:
-            #     character.save(filename="{}".format(i))
+        mood = MoodCalculator()
+        cam = CameraManager()
+        light = LightSetup()
+        log = Log()
+        tracker = Tracker(character)
+        
+        while current_frame < total_frames:
+            print(f"EPOCH {current_frame} OUT OF {self.value}")
+            l = character.make()
             
-        # log.save()
-        #character.save(filename="test")  #(filename="%04d" % i)
+            approve, color = mood.make(character)
+            if approve:
+                tex = background.make(exception=color)
+                light.make(l, tex)
+                #cam.make()
+                if tracker.make(character):
+                    log.make(str("%04d" % current_frame), tracker.get())
+                    #renderer.render(filename=str("%04d" % current_frame))
+                    log.save()
+                    current_frame+=1
+
+                    # DEBUG
+                    # if not BLEND_DIR in os.listdir():
+                    #     os.mkdir(BLEND_DIR)
+                    # bpy.ops.wm.save_as_mainfile(filepath='{}.blend'.format(str(i)))
+        tracker.tree.show()
+        tracker.export()
 

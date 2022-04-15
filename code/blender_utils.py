@@ -21,9 +21,23 @@ def get_nodes_link(node1, node2, links):
 			if node2.name == link.to_node.name:
 				return link
 
+def get_fromnode_links(node, links):
+	_links = []
+	for link in [x for x in links]:
+		if node.name == link.from_node.name:
+			_links.append(link)
+	return _links
+
+def get_tonode_links(node, links):
+	_links = []
+	for link in [x for x in links]:
+		if node.name == link.to_node.name:
+			_links.append(link)
+	return _links
+
 def normalize_prob(prob):
     return np.array(prob) / np.array(prob).sum(0)
 
-def select(_volume):
-	_volume.select_set(True)
-	bpy.context.view_layer.objects.active = _volume
+def select(obj):
+	obj.select_set(True)
+	bpy.context.view_layer.objects.active = obj
