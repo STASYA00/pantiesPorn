@@ -1,5 +1,5 @@
 # To run the code:
-# $ blender -b assets/Master_Generator/MP_10/MP_10_01.blend --python code/run.py
+# $ blender -b assets/models/MP_04_01.blend --python code/run.py
 import argparse
 import os
 import sys
@@ -46,12 +46,12 @@ if __name__=="__main__":
         except SystemExit as e:
             print("")
     if args:
-        print(args.keys)
         OUTPUT_FOLDER = args.output
         RENDERS = args.frames
         START = args.start
     else:
         START = 0
+    print(START, RENDERS)
     t1 = time()
     pipe = MainPipeline(RENDERS)
     pipe.run(START)

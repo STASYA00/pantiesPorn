@@ -12,7 +12,7 @@ class Material:
     def __init__(self, part):
         self.part = part
         self.factory = TextureFactory()
-        self.has_print = False
+        self.has_print = ""
         self._nodes = self._get_node()
         self.colorgen = None
         self._suffix = "NFT"
@@ -128,7 +128,7 @@ class NftMaterial(SubstanceMaterial):
     def _produce_textures(self, category):
         self.active_values.append(category)
         _result = self.factory.produce_substance(category)
-        nft_print = self.factory.produce("print", texture_type=2)[0]
+        nft_print = self.factory.produce(self.has_print, texture_type=2)[0]
         return _result, nft_print
 
     def _update_nodes(self, materials):
@@ -155,7 +155,14 @@ class FurMaterial(Material):
         Material.__init__(self, part)
 
     def _produce_textures(self, category):
-        category = "print"
+        _exception = []
+        texture = self.factory.produce(category, 
+                                             exception=_exception, 
+                                             texture_type=1)[0]
+        #self.active_values.append(print_texture)
+        return [texture]
+
+    def _produce_print_textures(self, category):
         _exception = []
         print_texture = self.factory.produce(category, 
                                              exception=_exception, 
@@ -224,7 +231,8 @@ class NonNftMaterial(Material):
 
     def _produce_print(self):
         if self.has_print:
-            return self.factory.produce("print", texture_type=2)
+            
+            return self.factory.produce(self.has_print, texture_type=2)
         return [None]
 
     def _produce_textures(self, category):
@@ -257,8 +265,9 @@ class NonNftMaterial(Material):
         #self._control_mix_nodes()
 
         # update the print node
-        self._update_value(self.has_print)
+        self._update_value(on=True)
         if self.has_print:
+            self._update_value(on=False)
             print_texture = textures[2]
             if print_texture:
                 if len(self._nodes) > 1 and self.has_print:
@@ -276,7 +285,7 @@ class NonNftMaterial(Material):
         _links = [x for x in material.node_tree.links if x.from_node.name.startswith("Image Texture")]
         node, disp_node, print_node = None, None, None
         for link in _links:
-            if link.to_socket.name in ["Value", "Color1"]:
+            if link.to_socket.name in ["Value", "Color1", "Color"]:
                 print_node = link.from_node
             if link.to_socket.name in ["Alpha", "Color2"]:
                 node = link.from_node
@@ -300,15 +309,16 @@ class NonNftMaterial(Material):
             node.inputs[2].default_value = value
 
     def _update_value(self, which=0, on=True):
+        
         _nodes = [x for x in self.part.mesh.active_material.node_tree.nodes if "Mix" in x.name]
         sockets = ["Base Color"]
         if which == 1:
             sockets = ["Normal", "Displacement"]
-            
         if len(_nodes) > 0:
             _links = [x for x in self.part.mesh.active_material.node_tree.links if x.from_node.name.startswith("Mix")]
             for socket in sockets:
                 for link in _links:
+                    
                     if link.to_socket.name == socket:
                         _node = link.from_node
                         _node.inputs[0].default_value = on

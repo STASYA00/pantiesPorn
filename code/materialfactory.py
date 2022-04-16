@@ -37,7 +37,7 @@ class TextureFactory:
         if texture_type == 1:
             return self._produce(fabric, exception)
         elif texture_type == 2:
-            return self._produce_print()
+            return self._produce_print(fabric)
         elif texture_type == 3:
             return self._produce_metal_texture(fabric)
         else:
@@ -84,16 +84,26 @@ class TextureFactory:
         else:
             print(f"DISPLACEMENT MAP {fabric} NOT IN FOLDER {folder}")
 
-    def _produce_print(self)->list:
-        textures = []
-        mat = self._naming.matfolders[2]  # "NFT"
-        folder = np.random.choice([x for x in os.listdir(TEXTURES + 
-                                                    "/" + mat) if os.path.isdir(TEXTURES + 
-                                                    "/" + mat + "/" + x)], 1)[0]
-        fab = np.random.choice([x for x in os.listdir(TEXTURES + 
-                                                    "/" + mat + "/" + folder) if "." in x], 1)[0]  # filename
-        textures.append(Texture(mat + "/" + folder, fab))
+    def _produce_print(self, nft)->list:
+        textures=[]
+        mat = f'{TEXTURES}/{self._naming.matfolders[2]}'  # "NFT"
+        nfts = [x for x in os.listdir(mat) if not os.path.isdir(f'{mat}/{x}') if nft.lower() in x.lower()]
+        _nft = np.random.choice([x for x in os.listdir(mat) if not os.path.isdir(f'{mat}/{x}')],1)[0]
+        if len(nfts) > 0:
+            _nft = nfts[0]
+        textures.append(Texture(self._naming.matfolders[2], _nft))
         return textures
+
+    # def _produce_print_old(self)->list:
+    #     textures = []
+    #     mat = self._naming.matfolders[2]  # "NFT"
+    #     folder = np.random.choice([x for x in os.listdir(TEXTURES + 
+    #                                                 "/" + mat) if os.path.isdir(TEXTURES + 
+    #                                                 "/" + mat + "/" + x)], 1)[0]
+    #     fab = np.random.choice([x for x in os.listdir(TEXTURES + 
+    #                                                 "/" + mat + "/" + folder) if "." in x], 1)[0]  # filename
+    #     textures.append(Texture(mat + "/" + folder, fab))
+    #     return textures
 
     def _produce_metal_texture(self, name)->list:
         textures = []

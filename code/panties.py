@@ -7,6 +7,7 @@ from config import PART_COLLECTION, MESH_NAME, LIGHT_SETUP, TRIM_COLLECTION
 from controller import Controller
 from factory import Factory
 from log import PantiesModels
+from nft_generator import NftGen
 from part import TrimPart
 from weights import Weights
 
@@ -19,18 +20,19 @@ class Panties:
         self.variants = self._get_variants()
         self.active_variant = self._variant()
         self.parts = self._populate()
+        self._nftgen = NftGen()
         self.weights = Weights()
         self._controller = Controller()
+        self._ind = 0
         self.hasprint = self._has_print()
-        self.hastrim = self._has_trim()
+        
 
     def _has_print(self):
-        value = np.random.random()
-        return value < self.weights.get("nft")
+        # value = np.random.random()
+        # return value < self.weights.get("nft")
 
-    def _has_trim(self):
-        value = np.random.random()
-        return value < self.weights.get("trim")
+        # returns print name
+        return self._nftgen.check(model=self._name_model().lower(), ind=self._ind)
 
     def get_children(self, variant=None):
         """
@@ -53,8 +55,13 @@ class Panties:
             print(repr(e))
             raise KeyboardInterrupt
 
-    def make(self):
+    def make(self, value):
+        self._ind = value
         return self._make()
+
+    def reset(self):
+        for part in self.parts[self.active_variant]:
+            part.reset()
 
     def _activate_variant(self):
         for _v in self.variants:
@@ -88,16 +95,14 @@ class Panties:
         self._activate_variant()
         self.hasprint = self._has_print()
         printed_part = self._set_print()
-        self.hastrim = self._has_trim()
-        self._hide_trim(value=not self.hastrim)
         
         for _part in self.parts[self.active_variant]:
             if _part.name == printed_part:
-                _part.has_print = True
+                _part.has_print = self.hasprint
+                print(f"{_part.name} has print")
             if isinstance(_part, TrimPart):
-                if not self.hastrim:
-                    _part.active_values = ["hidden"]
-                    continue
+                _part.active_values = ["hidden"]
+                continue
             _part.make()
             
         self._controller.make(self)
@@ -127,7 +132,8 @@ class Panties:
 
     def _set_print(self):
         if self.hasprint and self._name_model().lower()!="paris":
-            rel_parts = [x for x in self.parts[self.active_variant]]
+            rel_parts = [x for x in self.parts[self.active_variant] if "front" in x.name.lower()]
+            print("relevant", rel_parts)
             printed_part = np.random.choice(rel_parts, 1)[0].name
             return printed_part
 

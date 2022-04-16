@@ -66,7 +66,7 @@ class Tracker:
 
     def _get_value(self, configuration, material):
         _print = 0
-        if material.startswith("print"):
+        if material.startswith("print") and material.lower()!="print_loop":
             _print = 1
         part = configuration.get_part(material)
         if len(part.active_values) > _print:

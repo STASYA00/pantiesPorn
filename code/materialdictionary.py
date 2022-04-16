@@ -63,7 +63,7 @@ class MaterialDictionary:
             len([x.lower() for x in value.keys() if fabric.lower().startswith(x.lower())]) > 0
 
     def _get_fabric(self, fabric, value):
-        return value[[x.lower() for x in value.keys() if fabric.lower().startswith(x.lower())][0]]
+        return value[[x for x in value.keys() if fabric.lower().startswith(x.lower())][0]]
 
 
 class SubstanceDictionary:

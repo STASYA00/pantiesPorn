@@ -77,6 +77,7 @@ class MainPipeline(Pipeline):
         """
         Function that creates different character configurations.
         """
+        start = current_frame
         total_frames = self.value + current_frame
         background = Background()
         character = Panties()
@@ -88,8 +89,9 @@ class MainPipeline(Pipeline):
         tracker = Tracker(character)
         
         while current_frame < total_frames:
-            print(f"EPOCH {current_frame} OUT OF {self.value}")
-            l = character.make()
+            print(f"EPOCH {current_frame-start} OUT OF {self.value}")
+            character.reset()
+            l = character.make(current_frame-start)
             
             approve, color = mood.make(character)
             if approve:
@@ -97,10 +99,10 @@ class MainPipeline(Pipeline):
                 light.make(l, tex)
                 #cam.make()
                 if tracker.make(character):
-                    log.make(str("%04d" % current_frame), tracker.get())
-                    #renderer.render(filename=str("%04d" % current_frame))
+                    log.make(str("%04d" % current_frame), tracker.get(), tex)
+                    renderer.render(filename=str("%04d" % current_frame))
                     log.save()
-                    current_frame+=1
+                    current_frame += 1
 
                     # DEBUG
                     # if not BLEND_DIR in os.listdir():

@@ -20,7 +20,7 @@ class Renderer:
         self.scene.render.engine = self.engine
         self.scene.cycles.device = "GPU"
         self.scene.render.use_persistent_data = True
-        self.scene.render.image_settings.color_mode = 'RGBA'
+        
         self.scene.render.resolution_percentage = 100
         self.scene.render.resolution_x = IMAGE_SIZE[0]
         self.scene.render.resolution_y = IMAGE_SIZE[1]
@@ -42,20 +42,26 @@ class Renderer:
          gpu_dev = [x for x in pref.devices if x.type=="CUDA"][0]
          pref.compute_device_type = gpu_dev.type
          gpu_dev.use = True
+
+    def _set_img_settings(self):
+        image_settings = bpy.context.scene.render.image_settings
+        image_settings.file_format = "PNG"
+        image_settings.color_depth = '8'
+        image_settings.color_mode = 'RGBA'
+
         
     def _render(self, filename):
         """
         Function that renders the scene.
         :return:
         """
-        image_settings = bpy.context.scene.render.image_settings
-        image_settings.file_format = "PNG"
-        image_settings.color_depth = '8'
+        self._set_img_settings()
         
         bpy.data.scenes[self._scene_name].render.engine = self.engine
         
         bpy.ops.render.render()
         d = PantiesModels()
+        print(f"output folder: {OUTPUT_FOLDER}")
         if not OUTPUT_FOLDER in os.listdir():
             os.mkdir(OUTPUT_FOLDER)
         model = bpy.data.filepath.split(".")[-2][-4]
@@ -65,6 +71,7 @@ class Renderer:
         try:
             bpy.data.images["Render Result"].save_render(
                 self.naming.filename.format(filename))
+            print(f"Image saved as {self.naming.filename.format(filename)}")
         except RuntimeError as e:
             print(repr(e))
             print("Could not save the render {}".format(filename))

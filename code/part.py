@@ -5,6 +5,7 @@ from colorgen import ColorGenerator
 from category_picker import CategoryPicker
 from condition import Condition
 from material import *
+from materialdictionary import MaterialDictionary
 
 class Part:
     """
@@ -18,7 +19,7 @@ class Part:
         self.mesh = self._load()
         self.materials = self._load_materials()
         self.active_values = []
-        self.has_print = False
+        self.has_print = ""
 
     def make(self):
         """
@@ -52,13 +53,12 @@ class Part:
         Function that gets the customizable node from the part's active material tree.
         """
         
-        self._reset()
         self._update_materials()
         self._clean_active()
 
-    def _reset(self):
+    def reset(self):
         self.active_values = []
-        self.has_print = False
+        self.has_print = ""
 
     def _update_materials(self):
         for m in self.materials:
@@ -68,10 +68,12 @@ class Part:
 class FabricPart(Part):
     def __init__(self, name) -> None:
         Part.__init__(self, name)
-        self._picker = CategoryPicker()
+        #self._picker = CategoryPicker()
 
     def _update_materials(self):
-        category, values = self._picker.make(self)
+        #category, values = self._picker.make(self)
+        category = MaterialDictionary()._get_random()
+        values = [True]
         
         for m, val in zip(self.materials, values):
             m.has_print = self.has_print
@@ -81,7 +83,7 @@ class FabricPart(Part):
 class SubstancePart(Part):
     def __init__(self, name) -> None:
         Part.__init__(self, name)
-        self.has_print = True
+        self.has_print = ""
         self._picker = CategoryPicker()
     
     def _load_materials(self):
@@ -111,7 +113,7 @@ class PatchPart(Part):
 class FurPart(Part):
     def __init__(self, name) -> None:
         Part.__init__(self, name)
-        self.has_print = True
+        self.has_print = ""
 
     def _load_materials(self):
         return [FurMaterial(self)]
