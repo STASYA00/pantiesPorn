@@ -21,7 +21,7 @@ class NftGen:
         # otherwise returns none
         nfts = [key for key, x in self._content[model.lower()].items() if ind in x]
         if len(nfts)>0:
-            print("NFTs", nfts)
+            
             return nfts[0]
         #path="C:/Users/STFED/_A/_other/PantiesPorn_1/assets/Master_Generator/Material_Library/NFT"
         #nft = np.random.choice([x for x in os.listdir(path) if not os.path.isdir(f'{path}/{x}')], 1)[0]
@@ -59,7 +59,7 @@ class NftGen:
         if params[1] == 1:
             # names of nfts we create
             nfts = np.random.choice(self._parser.get_remaining(), amount, replace=False)
-            print(params[0], amount)
+            
             numbers = np.random.choice(range(1, params[0]), amount, replace=False)
             
             for nft, number in zip(nfts, numbers):

@@ -76,22 +76,21 @@ class Log:
     def _add_attributes(self, attributes):
         _attr_collection = LogAttributeFactory().produce()
         for attr in _attr_collection:
-            result =attr.get(attributes)
+            result = attr.get(attributes)
             if result:
                 if result!="None":
-                    self._add_attr(attr.name, attr.get(attributes))
+                    self._add_attr(attr.name, result)
 
     def _attr(self, key, value):
         return {"trait_type": key, "value": value}
 
     def _get_name(self):
         if self.content["name"]:
-            return JSON + "/" + self.content["name"][self.content["name"].index("#")+1:].rjust(4, "0") + ".json"
+            return JSON + "/" + str(int(self.content["name"][self.content["name"].index("#")+1:])-1).rjust(4, "0") + ".json"
         return JSON + "/" + "test.json"
 
     def _make(self, name, attributes, bgr):
         attributes["bgr"] = bgr
-        print(attributes)
         self.reset()
         self.content["name"] = f"Cryptopanties #{int(name)+1}"
         self.content["image"] = name + ".png"
@@ -118,7 +117,7 @@ class LogAttributeFactory:
         self._attributes = {"Upcycled NFT": NftLogAttribute, 
                             "NFT Author": NftAuthorLogAttribute,
                             "Identity": PantiesModelLogAttribute,
-                            "Background": BgrAttribute,
+                            "Background": BgrLogAttribute,
                             #"Parts": PartNumberLogAttribute,
                             #"Trim": TrimLogAttribute      
         }
@@ -138,7 +137,8 @@ class LogAttributeFactory:
     def _get_fabric_attrs(self):
         folder = self._naming.material_path.format(self._naming.matfolders[1], "")
         for f in os.listdir(folder):
-            self._attributes[f] = FabricLogAttribute
+            if f.lower() not in ["stitch", "background"]:
+                self._attributes[f] = FabricLogAttribute
 
 class LogAttribute:
     def __init__(self, name="generic", db=None, parser=None) -> None:
@@ -150,29 +150,29 @@ class LogAttribute:
     def get(self, attributes=None):
         return ""
 
-class BgrAttribute(LogAttribute):
+class BgrLogAttribute(LogAttribute):
     def __init__(self, name="Background", db=None, parser=None) -> None:
         LogAttribute.__init__(self, name, db=db, parser=parser)
-        self._content = {"d48791": "Bright",
-                         "ebc5b0": "Azure",
-                         "e6ad86": "Pink Sunset",
-                         "f4bf86": "Orange Sunset",
-                         "f5a685": "Pacific Island",
-                         "f5a893": "Calm",
-                         "f5b46e": "Restless",
-                         "f6baaa": "Cream Cake",
-                         "f9cf87": "Sunset",
-                         "f298ad": "Magenta",
-                         "f39183": "Lavender Aroma",
-                         "ffc27f": "Sahara Sands",
-        
-        
+        self._content = {"d48791": "Purple Night Romance",
+                         "ebc5b0": "Warm Pink Delight",
+                         "e6ad86": "Blue Baby Shine",
+                         "f298ad": "Pink Kinky Drama",
+                         "f39183": "Peace Out Paradiso",
+                         "f4bf86": "Hazy Morning Mist",
+                         "f5a685": "Pink Velvet Thunder",
+                         "f5a893": "Soft Pink Hope",
+                         "f5b46e": "Holy Golden Thunder",
+                         "f6baaa": "Peachy Cream Dream",
+                         "f9cf87": "Sex on the Beach",
+                         "ffc27f": "Golden Shadow Rise"        
         }
 
     def get(self, attributes):
         
         for k, v in attributes.items():
+            
             if "bgr" in k.lower():
+                
                 return self._content[v]
         return "None"
 
@@ -269,7 +269,7 @@ class PatchLogAttribute(LogAttribute):
     
 class TextureLogReplacement:
     def __init__(self) -> None:
-        self._content = pd.read_csv("assets/csv/material_tags.csv")
+        self._content = pd.read_csv("assets/Master_Generator/material_tags.csv")
         self._working = self._content.columns[1]
         self._log = self._content.columns[2]  # 3 if Malcolm's version
 

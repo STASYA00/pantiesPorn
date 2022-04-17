@@ -3,7 +3,7 @@
 
 # Output parameters
 OUTPUT_FOLDER = "output"  # where to save the rendered images
-IMAGE_SIZE = (2000, 2000)  # resolution of the output images (width, height)
+IMAGE_SIZE = (3333, 3333)  # resolution of the output images (width, height)
 RENDERS = 5  # number of images to render
 ASSEMBLE_FRAME = 1  # model configuration to assemble
 ENGINE = 'CYCLES'  # engine to render in Blender. Can be CYCLES or EEVEE
